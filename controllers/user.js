@@ -29,6 +29,7 @@ const getUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
+        res.status(400);
         res.send({ message: 'Переданы некорректные данные.' });
       } else if (err.statusCode === 404) {
         res.send({ message: 'Пользователь по указанному _id не найден.' });
@@ -45,7 +46,12 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
+        res.status(400);
+        res.send({
+          message: 'Одно из полей короче 2-х символов или длиннее 30 символов.',
+        });
+      } else if (err.name === 'CastError') {
         res.send({ message: 'Переданы некорректные данные.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
@@ -55,18 +61,35 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
-    name: req.params.name,
-    about: req.params.about,
+    name: req.body.name,
+    about: req.body.about,
   })
     .orFail(() => {
       const error = new Error();
       error.statusCode = 404;
       throw error;
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (
+        req.body.name.length < 2
+        || req.body.name.length > 30
+        || req.body.about.length < 2
+        || req.body.about.length > 30
+      ) {
+        res
+          .status(400)
+          .send({
+            message:
+              'Одно из полей короче 2-х символов или длиннее 30 символов.',
+          });
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+        res.send({
+          message: 'Переданы некорректные данные при обновлении профиля.',
+        });
       } else if (err.statusCode === 404) {
         res.send({ message: 'Пользователь с указанным  _id не найден.' });
       } else {
@@ -77,7 +100,7 @@ const updateUser = (req, res) => {
 
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
-    avatar: req.params.avatar,
+    avatar: req.body.avatar,
   })
     .orFail(() => {
       const error = new Error();
@@ -87,7 +110,9 @@ const updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.send({ message: 'Переданы некорректные данные при обновлении аватара.' });
+        res.send({
+          message: 'Переданы некорректные данные при обновлении аватара.',
+        });
       } else if (err.statusCode === 404) {
         res.send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
