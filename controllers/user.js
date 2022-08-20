@@ -63,7 +63,7 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
     name: req.body.name,
     about: req.body.about,
-  })
+  }, { new: true, runValidators: true })
     .orFail(() => {
       const error = new Error();
       error.statusCode = 404;
@@ -101,7 +101,7 @@ const updateUser = (req, res) => {
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {
     avatar: req.body.avatar,
-  })
+  }, { new: true, runValidators: true })
     .orFail(() => {
       const error = new Error();
       error.statusCode = 404;

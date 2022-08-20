@@ -71,7 +71,7 @@ const likeCard = (req, res) => {
       } else if (err.statusCode === 400) {
         res.send({ message: 'Переданы некорректные данные для постановки лайка. ' });
       } else if (err.statusCode === 404) {
-        res.send({ message: 'Передан несуществующий _id карточки.' });
+        res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
       }
@@ -96,7 +96,7 @@ const dislikeCard = (req, res) => {
       } else if (err.statusCode === 400) {
         res.send({ message: 'Переданы некорректные данные для снятия лайка. ' });
       } else if (err.statusCode === 404) {
-        res.send({ message: 'Передан несуществующий _id карточки.' });
+        res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
       }
