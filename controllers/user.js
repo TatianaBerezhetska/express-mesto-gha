@@ -69,23 +69,14 @@ const updateUser = (req, res) => {
       throw error;
     })
     .then((user) => {
-      if (
-        req.body.name.length < 2
-        || req.body.name.length > 30
-        || req.body.about.length < 2
-        || req.body.about.length > 30
-      ) {
-        res
-          .status(400)
-          .send({
-            message:
-              'Одно из полей короче 2-х символов или длиннее 30 символов.',
-          });
-      }
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({
+          message: 'Одно из полей короче 2-х символов или длиннее 30 символов.',
+        });
+      } else if (err.name === 'CastError') {
         res.send({
           message: 'Переданы некорректные данные при обновлении профиля.',
         });
