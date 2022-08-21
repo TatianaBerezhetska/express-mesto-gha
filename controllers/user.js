@@ -29,10 +29,9 @@ const getUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400);
-        res.send({ message: 'Переданы некорректные данные.' });
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
       } else if (err.statusCode === 404) {
-        res.send({ message: 'Пользователь по указанному _id не найден.' });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
       }
@@ -91,7 +90,7 @@ const updateUser = (req, res) => {
           message: 'Переданы некорректные данные при обновлении профиля.',
         });
       } else if (err.statusCode === 404) {
-        res.send({ message: 'Пользователь с указанным  _id не найден.' });
+        res.status(404).send({ message: 'Пользователь с указанным  _id не найден.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
       }

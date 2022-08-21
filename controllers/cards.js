@@ -46,7 +46,7 @@ const deleteCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные.' });
       } else if (err.statusCode === 404) {
-        res.send({ message: 'Карточка с указанным _id не найдена.' });
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
       } else {
         res.send({ message: `Произошла ошибка ${err}.` });
       }
