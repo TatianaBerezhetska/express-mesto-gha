@@ -6,6 +6,7 @@ const app = express();
 const mongoose = require('mongoose');
 const userRouter = require('./routes/user');
 const cardsRouter = require('./routes/cards');
+const { ERR_NOT_FOUND } = require('./utils/errorCodes');
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
@@ -23,7 +24,7 @@ app.use('/users', userRouter);
 app.use('/cards', cardsRouter);
 
 app.use((req, res) => {
-  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
+  res.status(ERR_NOT_FOUND).send({ message: 'Страница по указанному маршруту не найдена' });
 });
 
 app.listen(PORT, () => {
