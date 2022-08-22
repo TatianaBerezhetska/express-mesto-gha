@@ -14,7 +14,7 @@ const getCards = (req, res) => {
     })
     .then((cards) => res.send({ data: cards }))
     .catch(() => {
-      res.send({ message: 'Произошла ошибка.' });
+      res.status(ERR_BAD_REQUEST).send({ message: 'Произошла ошибка.' });
     });
 };
 

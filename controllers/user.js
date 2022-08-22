@@ -47,6 +47,8 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
+        const { errors } = err;
+        console.log(errors);
         if (err.errors.name) {
           res.status(ERR_BAD_REQUEST).send({ message: err.errors.name.message });
         } else if (err.errors.about) {
