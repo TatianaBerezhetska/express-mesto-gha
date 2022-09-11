@@ -3,6 +3,7 @@ const {
   ERR_BAD_REQUEST,
   ERR_NOT_FOUND,
   ERR_SERVER_ERROR,
+  ERR_UNAUTHORIZED,
 } = require('../utils/errorCodes');
 
 const getCards = (req, res) => {
@@ -40,13 +41,22 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+  const currentUser = req.user._id;
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      const cardOwner = card.owner;
+      if (currentUser === cardOwner.toString()) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .orFail(() => {
+            const error = new Error();
+            error.statusCode = 404;
+            throw error;
+          })
+          .then(() => res.send({ data: card }));
+      } else {
+        res.status(ERR_UNAUTHORIZED).send({ message: 'Удаление чужих карточек невозможно' });
+      }
     })
-    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERR_BAD_REQUEST).send({ message: 'Переданы некорректные данные.' });
