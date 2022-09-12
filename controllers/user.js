@@ -102,6 +102,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      console.log('user found');
       const token = jwt.sign(
         { _id: user._id },
         'encrypted-key',

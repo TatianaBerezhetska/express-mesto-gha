@@ -10,6 +10,7 @@ const { login, createUser } = require('./controllers/user');
 const userRouter = require('./routes/user');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
+const urlRegExp = require('./utils/RegExp');
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
@@ -28,7 +29,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().pattern(urlRegExp),
   }),
 }), createUser);
 
