@@ -7,13 +7,11 @@ const NotFoundError = require('../errors/not-found-err');
 const getCards = (req, res, next) => {
   Card.find({})
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Карточка с указанным _id не найдена.');
     })
     .then((cards) => res.send({ data: cards }))
-    .catch(() => {
-      next(new BadRequestError('Произошла ошибка.'));
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -48,7 +46,10 @@ const deleteCard = (req, res, next) => {
       const cardOwner = card.owner;
       if (currentUser === cardOwner.toString()) {
         Card.findByIdAndRemove(req.params.cardId)
-          .then(() => res.send({ data: card }));
+          .then(() => res.send({ data: card }))
+          .catch((err) => {
+            next(err);
+          });
       } else {
         throw new ForbiddenError('Удаление чужих карточек невозможно');
       }
@@ -94,9 +95,7 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Карточка с указанным _id не найдена.');
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {

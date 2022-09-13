@@ -11,6 +11,8 @@ const userRouter = require('./routes/user');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const urlRegExp = require('./utils/RegExp');
+const NotFoundError = require('./errors/not-found-err');
+const DefaultError = require('./errors/default-err');
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
@@ -36,25 +38,13 @@ app.post('/signup', celebrate({
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardsRouter);
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Страница по указанному маршруту не найдена'));
 });
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(DefaultError);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

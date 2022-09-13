@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const BadRequestError = require('../errors/bad-request-err');
-const UnauthorizedError = require('../errors/unauthorized-err');
 const NotFoundError = require('../errors/not-found-err');
 const ConflictError = require('../errors/conflict-err');
 
@@ -13,9 +12,7 @@ const SALT_ROUNDS = 10;
 const getUsers = (req, res, next) => {
   User.find({})
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Карточка с указанным _id не найдена.');
     })
     .then((users) => {
       res.send({ data: users });
@@ -28,18 +25,14 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Карточка с указанным _id не найдена.');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
-      } else if (err.statusCode === 404) {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
-        next(err);
+        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       }
     });
 };
@@ -48,9 +41,7 @@ const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Карточка с указанным _id не найдена.');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -110,8 +101,8 @@ const login = (req, res, next) => {
       );
       res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Необходима авторизация'));
+    .catch((err) => {
+      next(err);
     });
 };
 
