@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const validator = require('validator');
 
+const urlRegExp = require('../utils/RegExp');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
 const userSchema = new mongoose.Schema({
@@ -35,7 +36,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
-      validator: (avatar) => validator.isURL(avatar),
+      validator: (avatar) => urlRegExp.test(avatar),
       message: 'Введите ссылку в верном формате',
     },
   },

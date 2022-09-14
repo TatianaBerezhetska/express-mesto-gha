@@ -25,14 +25,14 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена.');
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
       } else {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
+        next(err);
       }
     });
 };
@@ -41,14 +41,12 @@ const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена.');
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
-      } else if (err.statusCode === 404) {
-        next(new NotFoundError('Пользователь по указанному _id не найден.'));
       } else {
         next(err);
       }
@@ -112,9 +110,7 @@ const updateUser = (req, res, next) => {
     about: req.body.about,
   }, { new: true, runValidators: true })
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
     .then((user) => {
       res.send({ data: user });
@@ -130,8 +126,6 @@ const updateUser = (req, res, next) => {
         }
       } else if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
-      } else if (err.statusCode === 404) {
-        next(new NotFoundError('Пользователь с указанным  _id не найден.'));
       } else {
         next(err);
       }
@@ -143,9 +137,7 @@ const updateAvatar = (req, res, next) => {
     avatar: req.body.avatar,
   }, { new: true, runValidators: true })
     .orFail(() => {
-      const error = new Error();
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -157,8 +149,6 @@ const updateAvatar = (req, res, next) => {
         }
       } else if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
-      } else if (err.statusCode === 404) {
-        next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
         next(err);
       }
