@@ -13,10 +13,13 @@ const auth = require('./middlewares/auth');
 const urlRegExp = require('./utils/RegExp');
 const NotFoundError = require('./errors/not-found-err');
 const DefaultError = require('./errors/default-err');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -41,6 +44,8 @@ app.use('/cards', auth, cardsRouter);
 app.use((req, res, next) => {
   next(new NotFoundError('Страница по указанному маршруту не найдена'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
