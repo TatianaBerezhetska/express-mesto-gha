@@ -43,7 +43,7 @@ const getCurrentUser = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
@@ -113,7 +113,7 @@ const updateUser = (req, res, next) => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
     .then((user) => {
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -139,7 +139,7 @@ const updateAvatar = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         if (err.errors.avatar) {

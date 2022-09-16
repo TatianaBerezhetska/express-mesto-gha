@@ -1,6 +1,7 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
+const cors = require('cors');
 
 const { PORT = 3000 } = process.env;
 
@@ -18,6 +19,23 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
+
+const options = {
+  origin: [
+    'https://localhost:3010',
+    'http://localhost:3010',
+    'https://berezhetska.students.nomoredomains.sbs',
+    'http://berezhetska.students.nomoredomains.sbs',
+    'https://TatianaBerezhetska.github.io',
+  ],
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  credentials: true,
+};
+
+app.use('*', cors(options));
 
 app.use(requestLogger);
 
