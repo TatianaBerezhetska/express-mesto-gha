@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const cors = require('cors');
@@ -38,6 +39,12 @@ const options = {
 app.use('*', cors(options));
 
 app.use(requestLogger);
+
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
