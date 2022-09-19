@@ -8,6 +8,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 const mongoose = require('mongoose');
+const options = require('./utils/CORS-options');
 const { login, createUser } = require('./controllers/user');
 const userRouter = require('./routes/user');
 const cardsRouter = require('./routes/cards');
@@ -21,25 +22,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(express.json());
 
-const options = {
-  origin: [
-    'https://localhost:3010',
-    'http://localhost:3010',
-    'https://berezhetska.students.nomoredomains.sbs',
-    'http://berezhetska.students.nomoredomains.sbs',
-    'https://TatianaBerezhetska.github.io',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-};
-
 app.use('*', cors(options));
 
 app.use(requestLogger);
 
+// crash-тест для проверки работы pm2 (рестарт приложения)
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
@@ -63,8 +50,10 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
-app.use('/users', auth, userRouter);
-app.use('/cards', auth, cardsRouter);
+app.use(auth);
+
+app.use('/users', userRouter);
+app.use('/cards', cardsRouter);
 
 app.use((req, res, next) => {
   next(new NotFoundError('Страница по указанному маршруту не найдена'));

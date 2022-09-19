@@ -12,9 +12,6 @@ const SALT_ROUNDS = 10;
 
 const getUsers = (req, res, next) => {
   User.find({})
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена.');
-    })
     .then((users) => {
       res.send({ data: users });
     })
@@ -85,7 +82,8 @@ const createUser = (req, res, next) => {
             next(err);
           }
         });
-    });
+    })
+    .catch(next);
 };
 
 const login = (req, res, next) => {
