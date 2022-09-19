@@ -12,7 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Добавьте ссылку на фото'],
     validate: {
-      validator: (link) => validator.isUrl(link),
+      validator: (link) => validator.isURL(link),
       message: 'Укажите ссылку на фото',
     },
   },
